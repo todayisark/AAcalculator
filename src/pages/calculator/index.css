@@ -1,0 +1,22 @@
+.container {
+  width: 80%;
+  margin: auto;
+  margin-top: 20px;
+}
+
+.row {
+  margin-bottom: 50px;
+}
+
+.flex {
+  display: flex;
+  flex-direction: row;
+}
+
+.section-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
