@@ -1,13 +1,4 @@
-import {
-  Row,
-  Col,
-  Input,
-  Button,
-  List,
-  Select,
-  Table,
-  InputNumber,
-} from "antd";
+import { Row, Col, Input, Button, Select, Table, InputNumber } from "antd";
 import React, { useState } from "react";
 import "./index.css";
 
