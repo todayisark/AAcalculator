@@ -10,7 +10,12 @@ import {
   Form,
   List,
 } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+
+const CACHE_KEY = "aa-calculator-data";
+const CACHE_EXPIRY_KEY = "aa-calculator-expiry";
+const EXPIRY_TIME = 60 * 60 * 24 * 15; // 15 days
 
 const Calculator = () => {
   // 参加者状态
@@ -18,12 +23,14 @@ const Calculator = () => {
   const [newParticipant, setNewParticipant] = useState<string>("");
 
   // 货币状态
-  const [currencies, setCurrencies] = useState<
-    { name: string; rate: number }[]
-  >([]);
+  const [currency, setCurrency] = useState<
+    { name: string; rate: number } | undefined
+  >(undefined);
   const [baseCurrency, setBaseCurrency] = useState<string>("CNY");
   const [currencyName, setCurrencyName] = useState<string>("KRW");
-  const [exchangeRate, setExchangeRate] = useState<number>(200);
+  const [exchangeRate, setExchangeRate] = useState<number | undefined>(
+    undefined
+  );
 
   // 收支状态
   const [transactions, setTransactions] = useState<
@@ -44,6 +51,52 @@ const Calculator = () => {
   // 结算货币状态
   const [settleCurrency, setSettleCurrency] = useState<string>(baseCurrency);
 
+  const [rateDisplay, setRateDisplay] = useState<number | undefined>(undefined);
+
+  // 加载缓存
+  useEffect(() => {
+    const expiry = Cookies.get(CACHE_EXPIRY_KEY);
+    if (!expiry || Date.now() - parseInt(expiry, 10) > EXPIRY_TIME * 1000) {
+      console.log("缓存过期，清空数据");
+      localStorage.removeItem(CACHE_KEY);
+      return;
+    }
+
+    const savedData = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+    if (savedData) {
+      setParticipants(savedData.participants || []);
+      setTransactions(savedData.transactions || []);
+      setCurrency(savedData.currencies || []);
+      setBaseCurrency(savedData.baseCurrency || "CNY");
+      setSettleCurrency(savedData.settleCurrency || "CNY");
+    }
+  }, []);
+
+  // 监听数据变化，自动存储
+  useEffect(() => {
+    const saveData = {
+      participants,
+      transactions,
+      currencies: currency,
+      baseCurrency,
+      settleCurrency,
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(saveData));
+    Cookies.set(CACHE_EXPIRY_KEY, Date.now().toString(), { expires: 1 });
+  }, [participants, transactions, currency, baseCurrency, settleCurrency]);
+
+  // 清除缓存
+  const handleClearCache = () => {
+    localStorage.removeItem(CACHE_KEY);
+    Cookies.remove(CACHE_EXPIRY_KEY);
+    setParticipants([]);
+    setTransactions([]);
+    setCurrency(undefined);
+    setBaseCurrency("CNY");
+    setSettleCurrency("CNY");
+    alert("缓存已清除");
+  };
+
   // 处理参加者添加
   const handleAddParticipant = () => {
     if (newParticipant.trim()) {
@@ -58,21 +111,14 @@ const Calculator = () => {
   };
 
   // 处理货币添加
-  const handleAddCurrency = () => {
-    if (currencyName.trim() && exchangeRate > 0) {
-      const currencyExists = currencies.some(
-        (currency) => currency.name === currencyName
-      );
-      if (currencyExists) {
-        // 如果货币已经存在，弹出提示或者阻止添加
-        alert("货币已存在，不能重复添加");
-      } else {
-        setCurrencies([
-          ...currencies,
-          { name: currencyName, rate: exchangeRate },
-        ]);
-        setCurrencyName("");
-        setExchangeRate(1);
+  const handleEditCurrency = () => {
+    if (exchangeRate !== undefined) {
+      if (currencyName.trim() && exchangeRate > 0) {
+        setCurrency({ name: currencyName, rate: exchangeRate });
+        setRateDisplay(exchangeRate);
+        alert(
+          `汇率已更新: 1 ${baseCurrency} = ${exchangeRate} ${currencyName}`
+        );
       }
     }
   };
@@ -109,6 +155,7 @@ const Calculator = () => {
     } = {};
     const totalParticipants = participants.length;
 
+    // 初始化数据
     participants.forEach((participant) => {
       totalAmountPerParticipant[participant] = {};
       participants.forEach((otherParticipant) => {
@@ -117,16 +164,15 @@ const Calculator = () => {
     });
 
     transactions.forEach((transaction) => {
-      const rate =
-        currencies.find((currency) => currency.name === transaction.currency)
-          ?.rate || 1;
-      const settleRate =
-        currencies.find((currency) => currency.name === settleCurrency)?.rate ||
-        1;
+      if (!currency) return; // 避免 currency 为空时报错
 
-      const amountInBaseCurrency = transaction.amount / rate;
+      // 确保正确获取 rate
+      const rate = transaction.currency === baseCurrency ? 1 : currency.rate;
+      const settleRate = settleCurrency === baseCurrency ? 1 : currency.rate;
+
+      const amountInBaseCurrency = transaction.amount / rate; // 统一换算成基准货币
       const splitAmount = amountInBaseCurrency / totalParticipants;
-      const finalAmount = splitAmount * settleRate;
+      const finalAmount = splitAmount * settleRate; // 计算最终应付金额
 
       // 付款人减少自己应付的金额
       participants.forEach((participant) => {
@@ -137,7 +183,7 @@ const Calculator = () => {
       });
     });
 
-    // 合并欠款
+    // 合并欠款，避免双向重复计算
     participants.forEach((payer) => {
       participants.forEach((receiver) => {
         if (
@@ -146,11 +192,11 @@ const Calculator = () => {
         ) {
           totalAmountPerParticipant[payer][receiver] -=
             totalAmountPerParticipant[receiver][payer];
-          totalAmountPerParticipant[receiver][payer] = 0; // 清空另一方向的金额
+          totalAmountPerParticipant[receiver][payer] = 0;
         } else {
           totalAmountPerParticipant[receiver][payer] -=
             totalAmountPerParticipant[payer][receiver];
-          totalAmountPerParticipant[payer][receiver] = 0; // 清空该方向的金额
+          totalAmountPerParticipant[payer][receiver] = 0;
         }
       });
     });
@@ -264,18 +310,34 @@ const Calculator = () => {
                   <InputNumber
                     placeholder="汇率"
                     value={exchangeRate}
-                    onChange={(value) => setExchangeRate(value as number)}
+                    onChange={(value) => {
+                      setExchangeRate(value as number);
+                    }}
                   />
                   <span>{currencyName}</span>
                 </div>
               </Form.Item>
-              <Button type="primary" onClick={handleAddCurrency}>
-                确认
+              <Button type="primary" onClick={handleEditCurrency}>
+                {currency?.rate ? `更新` : `确认`}
               </Button>
 
-              <div className="mt-40 mb-20">
-                {`当前汇率：${baseCurrency} -> ${currencyName} = ${exchangeRate}`}
-              </div>
+              {currency?.rate ? (
+                <div className="mt-40 mb-20">
+                  {`当前汇率：${baseCurrency} -> ${currencyName} = ${rateDisplay}`}
+                </div>
+              ) : (
+                <div className="mt-40 mb-20">
+                  <span>当前汇率：</span>
+                  <span
+                    style={{
+                      color: "red",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    未设置
+                  </span>
+                </div>
+              )}
             </Col>
           </Row>
         </Card>
@@ -301,10 +363,7 @@ const Calculator = () => {
                         placeholder="币种"
                         options={[
                           { label: baseCurrency, value: baseCurrency }, // 添加基准货币
-                          ...currencies.map((currency) => ({
-                            label: currency.name,
-                            value: currency.name,
-                          })),
+                          { label: currencyName, value: currencyName },
                         ]}
                         style={{ width: "100px" }}
                         allowClear
@@ -385,11 +444,8 @@ const Calculator = () => {
                 onChange={(value) => setSettleCurrency(value)}
                 placeholder="选择结算货币"
                 options={[
-                  { label: baseCurrency, value: baseCurrency }, // 添加基准货币
-                  ...currencies.map((currency) => ({
-                    label: currency.name,
-                    value: currency.name,
-                  })),
+                  { label: baseCurrency, value: baseCurrency },
+                  { label: currencyName, value: currencyName },
                 ]}
                 style={{ marginLeft: 10 }}
               />
@@ -404,13 +460,20 @@ const Calculator = () => {
           }
         >
           <Row gutter={[16, 16]} className="row">
-            <Col span={24}></Col>
             <Col span={24}>
               <Table
                 columns={columns}
                 dataSource={tableData}
                 pagination={false}
               />
+              <Button
+                type="primary"
+                danger
+                onClick={handleClearCache}
+                className="mt-20"
+              >
+                清除缓存
+              </Button>
             </Col>
           </Row>
         </Card>
