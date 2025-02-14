@@ -1,70 +1,67 @@
-# Getting Started with Create React App
+# 💰 费用分摊计算器 (AA Calculator)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+📌 **费用分摊计算器** 是一个基于 **React + Ant Design** 开发的 Web 应用，支持多货币汇率计算，帮助多人 **平摊账单**，自动计算应付款项，让结账更轻松！
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+👉 **[在线 Demo](https://todayisark.github.io/AAcalculator/)**
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## ✨ 功能介绍
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+✅ **添加参与者**：输入名称后可一键添加/删除  
+✅ **多货币支持**：设置不同货币及汇率，支持跨币种结算  
+✅ **记录消费**：输入消费金额、选择付款人，自动加入账单  
+✅ **智能分摊**：自动计算每个人应付款项，支持不同结算货币  
+✅ **可视化结果**：使用表格清晰展示付款人与收款人信息
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🏗️ 技术栈
 
-### `npm run build`
+- **前端**：React + Ant Design (AntD)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🚀 安装 & 运行
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 1️⃣ **克隆仓库**
 
-### `npm run eject`
+```bash
+git clone https://github.com/yourusername/yourproject.git
+cd yourproject
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 2️⃣ **安装依赖**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 3️⃣ **运行项目**
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm start
+```
 
-## Learn More
+项目将在 `http://localhost:3000` 运行。
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 📊 使用说明
 
-### Code Splitting
+1️⃣ **添加参与者** → 输入名字，点击“添加”  
+2️⃣ **设置货币汇率** → 选择基准货币，输入汇率，确认添加  
+3️⃣ **添加消费明细** → 输入消费内容、金额、付款人  
+4️⃣ **查看分摊结果** → 选择结算货币，刷新结算表格
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## 🛠️ 未来计划
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [ ] **添加汇率查询功能**
+- [ ] **添加多语言支持**
+- [ ] **支持账单导出（CSV / PNG）**
+- [ ] **优化 UI 交互体验**
+- [ ] **增加数据存储（本地存储 / 后端数据库）**

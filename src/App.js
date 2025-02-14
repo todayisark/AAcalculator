@@ -9,7 +9,19 @@ function App() {
         <div style={{ color: "white", fontSize: "20px" }}>费用分摊计算器</div>
       </Layout.Header>
       <Calculator />
-      <Layout.Footer>Footer</Layout.Footer>
+      <Layout.Footer>
+        <p>
+          © 2025 费用分摊计算器 Open-source on
+          <a
+            href="https://github.com/todayisark/AAcalculator"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+          .
+        </p>
+      </Layout.Footer>
     </Layout>
   );
 }

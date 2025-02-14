@@ -1,0 +1,96 @@
+.container {
+  width: 90%;
+  margin: auto;
+  margin-top: 20px;
+  max-width: 430px;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// width
+@for $size from 10 through 100 {
+  .w-#{$size} {
+    width: #{$size + 0%} !important; // 确保是百分比格式
+  }
+}
+
+// font-weight
+$weights: 100, 200, 300, 400, 500, 600, 700, 800, 900;
+@each $weight in $weights {
+  .font-weight-#{$weight} {
+    font-weight: #{$weight} !important;
+  }
+}
+
+// font-size
+@for $size from 12 through 40 {
+  .font-#{$size} {
+    font-size: #{$size}px !important;
+  }
+}
+
+// margin-top
+@for $size from 0 through 100 {
+  .mt-#{$size} {
+    margin-top: #{$size}px !important;
+  }
+}
+
+// margin-bottom
+@for $size from 0 through 100 {
+  .mb-#{$size} {
+    margin-bottom: #{$size}px !important;
+  }
+}
+
+// margin-left
+@for $size from 0 through 100 {
+  .ml-#{$size} {
+    margin-left: #{$size}px !important;
+  }
+}
+
+// margin-right
+@for $size from 0 through 100 {
+  .mr-#{$size} {
+    margin-right: #{$size}px !important;
+  }
+}
+
+// padding-top
+@for $size from 0 through 100 {
+  .pt-#{$size} {
+    padding-top: #{$size}px !important;
+  }
+}
+
+// padding-bottom
+@for $size from 0 through 100 {
+  .pb-#{$size} {
+    padding-bottom: #{$size}px !important;
+  }
+}
+
+// padding-left
+@for $size from 0 through 100 {
+  .pl-#{$size} {
+    padding-left: #{$size}px !important;
+  }
+}
+
+// padding-right
+@for $size from 0 through 100 {
+  .pr-#{$size} {
+    padding-right: #{$size}px !important;
+  }
+}
